@@ -1,0 +1,106 @@
+#!/usr/bin/env ruby18
+
+require 'pathname'
+ABS_PATH = Pathname.new(__FILE__).realpath.dirname #.parent
+$LOAD_PATH << ABS_PATH + "lib/"
+
+require 'commander/import'
+
+program(:version, '0.0.1')
+program(:description, 'Ruby Project Generator')
+program(:help_formatter, Commander::HelpFormatter::TerminalCompact)
+default_command :init
+ 
+command :init do |c|
+	c.syntax = 'rpi init [options]'
+	c.summary = 'Initialize a Ruby project file structure'
+	c.description = ''
+	c.example('Create a ruby project', 'command example')
+	c.option('-d', '--description DESCRITPION', String, 'Set a project description.')
+	c.option('-g', '--enablegit', 'Also initialize a git repository.')
+	c.action do |args, options|
+		options.default(:description => "<DESCRIPTION>")
+		
+		init(args,options)
+	end
+end
+
+
+def init(args,options)
+	projectname = args.shift || abort('Project name required. Abort.')
+
+	# create main directory
+	#
+	work("Create directory #{c(projectname,:bold)}", true) do
+
+		shell("mkdir #{projectname}", options.trace)
+	end
+
+	# create sub directories (which?)
+	#
+	['bin','lib','res'].each do |d|
+		work("Create directory #{c(projectname + "/" + d,:bold)}") do
+			shell("mkdir #{projectname}/#{d}", options.trace)
+		end
+	end
+
+	# create binary file
+	#
+	work("Build bin file #{c(projectname + "/bin/" + projectname, :bold)}", true) do
+		
+		# for now, just touch it
+		shell("touch #{projectname}/bin/#{projectname}", options.trace)
+	end
+
+	# create README
+	#
+	work("Build README file #{c(projectname + "/README", :bold)}", true) do
+
+		# for now, just touch it
+		shell("touch #{projectname}/README", options.trace)
+	end
+	
+	# usw
+	#
+
+	# initialize git if enabled
+	#
+	work ("Initialize Git repository") do	
+		shell("cd ./#{projectname}; git init -q; git add .; git commit -a -m 'initial commit'", options.trace)
+	end if options.enablegit
+
+	
+end
+
+
+LJUST=50
+
+# covers shell calls
+#
+def shell(str,output)
+	system("#{str} #{"> /dev/null 2>&1" unless output}")
+	$?
+end
+
+# a work-step with fancy console-output
+#
+def work(msg, abortion=false)
+	print "#{c(" *",:bold,:yellow)} #{msg.ljust(LJUST,'.')}"
+	
+	# execute
+	#
+	ret = yield
+	
+	puts (ret == 0 ? "[" + c("ok",:green,:bold) + "]" : "[" + c("!!",:red,:bold) + "]")
+
+	# if abortion flag is set, abort
+	if (abortion && ret != 0)
+		abort("Critical error: #{c("Aborted",:red,:bold)}.")
+	end	
+
+	return ret
+end
+
+def c(*a)
+	HighLine.color(*a)
+end

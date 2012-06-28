@@ -1,0 +1,20 @@
+= RPI - Ruby Project Initializer
+
+Initializes a full ruby project session.
+(Just a small modification of visionmedia's commander-tool[1]).
+
+
+== Features
+
+* Creates directory structure
+* Provides template files
+* Git support
+
+
+== Requirements
+
+* visionmedia/commander
+  [1] https://github.com/visionmedia/commander/
+
+* highline
+  [2] http://rubyforge.org/projects/highline/
