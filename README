@@ -13,8 +13,7 @@ Initializes a full ruby project session.
 
 == Requirements
 
-* visionmedia/commander
+* visionmedia/commander (tested again v4.1.1)
   [1] https://github.com/visionmedia/commander/
-
-* highline
+* highline (tested again v1.6.11)
   [2] http://rubyforge.org/projects/highline/
