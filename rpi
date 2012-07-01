@@ -142,14 +142,14 @@ def init(args,options)
 	# initialize git if enabled
 	#
 	work ("Initialize Git repository in #{c("#{projectname}",:bold)}") do
-		shell("cd ./#{projectname}; git init -q; git add .; git commit -a -m 'initial commit'", options.trace)
-
 		begin
 			File.open("./#{projectname}/.gitignore","w") {|f| f.write(text_gitignore)}
 			0
 		rescue
 			false
 		end
+
+		shell("cd ./#{projectname}; git init -q; git add .; git commit -a -m 'initial commit'", options.trace)
 	end if options.enablegit
 
 	
