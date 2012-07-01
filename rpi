@@ -87,8 +87,13 @@ def init(args,options)
 
 	# create lib file
 	#
-	work("Touch lib file #{c(projectname + "/lib/" + projectname + ".rb", :bold)}") do
-		shell("touch #{projectname}/lib/#{projectname}.rb", options.trace)
+	work("Build lib file #{c(projectname + "/lib/" + projectname + ".rb", :bold)}") do
+		begin
+			File.open("./#{projectname}/lib/#{projectname}.rb", 'w') { |f| f.write(text_lib(projectname,options)) }
+			0
+		rescue
+			false
+		end
 	end
 
 	# create binary file
@@ -225,6 +230,22 @@ def text_readme(projectname, options)
 }
 end
 
+def text_lib(projectname,options)
+%Q{module #{projectname.capitalize}
+
+	Author = Struct.new(:name, :email)
+	class Author; def to_s; self[:name] + " <" + self[:email] + ">"; end; end
+
+	VERSION		= 'unreleased'
+	AUTHORS		= [Author.new('#{options.author}','#{options.email}')]
+	HOMEPAGE	= ''
+
+end
+
+# require ...
+}
+end
+
 def text_bin(projectname, options)
 %Q{#!/usr/bin/env ruby
 
@@ -238,9 +259,10 @@ $LOAD_PATH << ABS_PATH + "lib/"
 require 'commander/import'
 require '#{projectname}'
 
-program(:version, 'unreleased')
+program(:version, #{projectname.capitalize}::VERSION)
 program(:description, '#{options.description}')
-program(:help, 'Author', '#{options.author} #{options.email}')
+program(:help, 'Authors', #{projectname.capitalize}::AUTHORS.collect { |e| e.to_s }.join("\\n"))
+program(:help, 'Homepage', #{projectname.capitalize}::HOMEPAGE)
 default_command :main
 
 command :main do |c|
@@ -256,20 +278,21 @@ end
 }
 end
 
-def text_gemspec(projectname, options)
+def text_gemspec(projectname,options)
 now = Time.now
 %Q{require 'rake'
+require 'lib/#{projectname}'
 
 Gem::Specification.new do |s|
 
 	s.name		=	'#{projectname}'
-	s.version	=	'0.1'
+	s.version	=	#{projectname.capitalize}::VERSION
 	s.date		=	'#{now.year}-#{now.month.to_s.rjust(2,'0')}-#{now.mday.to_s.rjust(2,'0')}'
 	s.summary	=	"#{options.description}"
-	s.authors	=	["#{options.author}"]
-	s.email		=	'#{options.email}'
+	s.authors	=	#{projectname.capitalize}::AUTHORS.collect { |e| e[:name] }
+	s.email		=	#{projectname.capitalize}::AUTHORS.collect { |e| e[:email] }
 	s.files		=	FileList["bin/*","lib/*.rb","lib/#{projectname}/*.rb"].to_a
-	s.homepage	=	""
+	s.homepage	=	#{projectname.capitalize}::HOMEPAGE
 
 end
 }
