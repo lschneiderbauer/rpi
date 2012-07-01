@@ -207,9 +207,9 @@ def text_readme(projectname, options)
 
 == Requirements
 
-* visionmedia/commander (tested again v4.1.1)
+* visionmedia/commander (tested against v4.1.1)
   https://github.com/visionmedia/commander/
-* highline (tested again v1.6.11)
+* highline (tested against v1.6.11)
   http://rubyforge.org/projects/highline/
 }
 end
