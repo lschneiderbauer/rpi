@@ -1,0 +1,7 @@
+require 'rpi/readme'
+require 'rpi/license'
+require 'rpi/bin'
+require 'rpi/lib'
+require 'rpi/gitignore'
+require 'rpi/gemspec'
+require 'rpi/ebuild'

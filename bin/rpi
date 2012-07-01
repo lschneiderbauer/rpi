@@ -1,10 +1,11 @@
 #!/usr/bin/env ruby
 
 require 'pathname'
-ABS_PATH = Pathname.new(__FILE__).realpath.dirname #.parent
+ABS_PATH = Pathname.new(__FILE__).realpath.dirname.parent
 $LOAD_PATH << ABS_PATH + "lib/"
 
 require 'commander/import'
+require 'rpi'
 
 program(:version, 'unreleased')
 program(:description, 'Ruby Project Generator')
@@ -108,7 +109,7 @@ def init(args,options)
 	#
 	work("Copy LICENSE file #{c(projectname + "/LICENCE", :bold)}") do
 		begin
-			File.open("./#{projectname}/LICENSE",'w') {|f| f.write(text_license(options))}
+			File.open("./#{projectname}/LICENSE",'w') {|f| f.write(text_license(projectname,options))}
 			0
 		rescue
 			false
@@ -186,156 +187,4 @@ end
 
 def c(*a)
 	HighLine.color(*a)
-end
-
-
-# TEXT
-# ==============================================
-#
-def text_license(options)
-%Q{Copyright (C) 2011  #{options.author}
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-}
-end
-
-def text_readme(projectname, options)
-%Q{= #{projectname} - <??>
-
-#{options.description}
-
-
-== Features
-
-* no feature
-
-
-== Requirements
-
-* visionmedia/commander (tested against v4.1.1)
-  https://github.com/visionmedia/commander/
-* highline (tested against v1.6.11)
-  http://rubyforge.org/projects/highline/
-}
-end
-
-def text_lib(projectname,options)
-%Q{module #{projectname.capitalize}
-
-	Author = Struct.new(:name, :email)
-	class Author; def to_s; self[:name] + " <" + self[:email] + ">"; end; end
-
-	VERSION		= 'unreleased'
-	AUTHORS		= [Author.new('#{options.author}','#{options.email}')]
-	HOMEPAGE	= ''
-
-end
-
-# require ...
-}
-end
-
-def text_bin(projectname, options)
-%Q{#!/usr/bin/env ruby
-
-# set process name
-$0='#{projectname}'
-
-require 'pathname'
-ABS_PATH = Pathname.new(__FILE__).realpath.dirname.parent
-$LOAD_PATH << ABS_PATH + "lib/"
-
-require 'commander/import'
-require '#{projectname}'
-
-program(:version, #{projectname.capitalize}::VERSION)
-program(:description, '#{options.description}')
-program(:help, 'Authors', #{projectname.capitalize}::AUTHORS.collect { |e| e.to_s }.join("\\n"))
-program(:help, 'Homepage', #{projectname.capitalize}::HOMEPAGE)
-default_command :main
-
-command :main do |c|
-	c.syntax = '#{projectname} main [options]'
-	c.summary = ''
-	c.description = ''
-	c.example 'description', 'command example'
-	c.option '--some-switch', 'Some switch that does something'
-	c.action do |args, options|
-		# do something
-	end
-end
-}
-end
-
-def text_gemspec(projectname,options)
-now = Time.now
-%Q{require 'rake'
-require 'lib/#{projectname}'
-
-Gem::Specification.new do |s|
-
-	s.name		=	'#{projectname}'
-	s.version	=	#{projectname.capitalize}::VERSION
-	s.date		=	'#{now.year}-#{now.month.to_s.rjust(2,'0')}-#{now.mday.to_s.rjust(2,'0')}'
-	s.summary	=	"#{options.description}"
-	s.authors	=	#{projectname.capitalize}::AUTHORS.collect { |e| e[:name] }
-	s.email		=	#{projectname.capitalize}::AUTHORS.collect { |e| e[:email] }
-	s.files		=	FileList[
-					"bin/*",
-					"lib/*.rb",
-					"lib/#{projectname}/*.rb",
-					"README",
-					"LICENSE"
-				].to_a
-	s.homepage	=	#{projectname.capitalize}::HOMEPAGE
-
-end
-}
-end
-
-def text_ebuild(projectname,options)
-%Q{# Copyright 1999-2011 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# # $Header: $
-
-EAPI=4
-
-USE_RUBY="ruby18 ruby19"
-
-RUBY_FAKEGEM_TASK_DOC=""
-
-inherit ruby-fakegem
-
-DESCRIPTION="#{options.description}"
-#HOMEPAGE="HOMEPAGE"
-
-GITHUB_USER="GITHUBUSER"
-SRC_URI="https://github.com/${GITHUB_USER}/${PN}/tarball/v${PV} -> ${P}.tgz"
-RUBY_S="${GITHUB_USER}-${PN}-*"
-
-LICENSE="GPL-2"
-SLOT="0"
-KEYWORDS="~amd64"
-
-RDEPEND="${RDEPEND} >=dev-ruby/commander-4.1.1"
-
-all_ruby_install() {
-       ruby_fakegem_binwrapper #{projectname} || die
-}
-}
-end
-
-def text_gitignore
-%Q{.*.swp
-*.gem
-Gemfile.lock
-}
 end
