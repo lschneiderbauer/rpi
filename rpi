@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby18
+#!/usr/bin/env ruby
 
 require 'pathname'
 ABS_PATH = Pathname.new(__FILE__).realpath.dirname #.parent
@@ -6,22 +6,64 @@ $LOAD_PATH << ABS_PATH + "lib/"
 
 require 'commander/import'
 
-program(:version, '0.0.1')
+program(:version, 'unreleased')
 program(:description, 'Ruby Project Generator')
-program(:help_formatter, Commander::HelpFormatter::TerminalCompact)
+program(:help, 'Author', 'Lukas Schneiderbauer <lukas.schneiderbauer@gmail.com>')
 default_command :init
- 
+
 command :init do |c|
 	c.syntax = 'rpi init [options]'
-	c.summary = 'Initialize a Ruby project file structure'
-	c.description = ''
-	c.example('Create a ruby project', 'command example')
-	c.option('-d', '--description DESCRITPION', String, 'Set a project description.')
+	c.summary = 'Initialize a Ruby project file structure.'
+	c.description = 'Initializes a Ruby project file structure.'
+	c.example('Create a ruby project called \'TestProject\' within a git-repostory.', 'rpi TestProject -g')
+	c.option('-d', '--description DESCRIPTION', String, 'Set a project description.')
+	c.option('-a', '--author AUTHOR', String, 'Set the project author (overrides the default setting).')
+	c.option('-e', '--email EMAIL', String, 'Set the authors email address (overrides the default setting).')
 	c.option('-g', '--enablegit', 'Also initialize a git repository.')
 	c.action do |args, options|
 		options.default(:description => "<DESCRIPTION>")
+
+		#TODO: author, email:  default to <default>
 		
 		init(args,options)
+	end
+end
+
+command :author do |c|
+	c.syntax = 'rpi author [author]'
+	c.summary = 'Set or display the default author.'
+	c.description = 'Sets or displays the default author used for generating the initial project structure.'
+	c.example("Set default author to \'Foo Bar\'", "rpi author \"Foo Bar\"")
+	c.example("Get the current default author", "rpi author")
+
+	c.action do |args, options|
+
+		author = args.shift
+		if author.nil?
+			# display
+			#todo
+		else
+			# set
+			#todo
+		end
+	end
+end
+
+command :email do |c|
+	c.syntax = 'rpi email [email]'
+	c.summary = 'Set or display the default email address.'
+	c.description = 'Sets or displays the default email adress used for generating the initial project structure.'
+	c.example("Set default email address", "rpi email \"email@adress.com\"")
+
+	c.action do |args, options|
+		email = args.shift
+		if email.nil?
+			#display
+			#todo
+		else
+			#set
+			#todo
+		end
 	end
 end
 
@@ -32,41 +74,80 @@ def init(args,options)
 	# create main directory
 	#
 	work("Create directory #{c(projectname,:bold)}", true) do
-
 		shell("mkdir #{projectname}", options.trace)
 	end
 
 	# create sub directories (which?)
 	#
-	['bin','lib','res'].each do |d|
+	['bin','lib','res', "lib/#{projectname}"].each do |d|
 		work("Create directory #{c(projectname + "/" + d,:bold)}") do
 			shell("mkdir #{projectname}/#{d}", options.trace)
 		end
 	end
 
+	# create lib file
+	#
+	work("Touch lib file #{c(projectname + "/lib/" + projectname + ".rb", :bold)}") do
+		shell("touch #{projectname}/lib/#{projectname}.rb", options.trace)
+	end
+
 	# create binary file
 	#
 	work("Build bin file #{c(projectname + "/bin/" + projectname, :bold)}", true) do
-		
-		# for now, just touch it
-		shell("touch #{projectname}/bin/#{projectname}", options.trace)
+		begin
+			File.open("./#{projectname}/bin/#{projectname}",'w') {|f| f.write(text_bin(projectname,options))}
+			`chmod +x ./#{projectname}/bin/#{projectname}`
+			0
+		rescue
+			false
+		end
 	end
 
 	# create README
 	#
-	work("Build README file #{c(projectname + "/README", :bold)}", true) do
-
-		# for now, just touch it
-		shell("touch #{projectname}/README", options.trace)
+	work("Build README file #{c(projectname + "/README", :bold)}") do
+		begin
+			File.open("./#{projectname}/README",'w') {|f| f.write(text_readme(projectname,options))}
+			0
+		rescue
+			false
+		end
 	end
-	
-	# usw
+
+	# copy LICENCE
 	#
+	work("Copy LICENSE file #{c(projectname + "/LICENCE", :bold)}") do
+		begin
+			File.open("./#{projectname}/LICENSE",'w') {|f| f.write(text_license(options))}
+			0
+		rescue
+			false
+		end
+	end
+
+	# create gemspec file
+	#
+	work("Build Gemspec #{c(projectname + "/#{projectname}.gemspec",:bold)}") do
+		begin
+			File.open("./#{projectname}/#{projectname}.gemspec",'w') {|f| f.write(text_gemspec(projectname,options))}
+			0
+		rescue
+			false
+		end
+	end
+
 
 	# initialize git if enabled
 	#
-	work ("Initialize Git repository") do	
+	work ("Initialize Git repository in #{c("#{projectname}",:bold)}") do
 		shell("cd ./#{projectname}; git init -q; git add .; git commit -a -m 'initial commit'", options.trace)
+
+		begin
+			File.open("./#{projectname}/.gitignore","w") {|f| f.write(text_gitignore)}
+			0
+		rescue
+			false
+		end
 	end if options.enablegit
 
 	
@@ -103,4 +184,101 @@ end
 
 def c(*a)
 	HighLine.color(*a)
+end
+
+
+# TEXT
+# ==============================================
+#
+def text_license(options)
+%Q{Copyright (C) 2011  #{options.author}
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+}
+end
+
+def text_readme(projectname, options)
+%Q{= #{projectname} - #{options.description}
+
+<SUMMARY>
+
+
+== Features
+
+* no feature
+
+
+== Requirements
+
+* visionmedia/commander (tested again v4.1.1)
+  https://github.com/visionmedia/commander/
+* highline (tested again v1.6.11)
+  http://rubyforge.org/projects/highline/
+}
+end
+
+def text_bin(projectname, options)
+%Q{#!/usr/bin/env ruby
+
+# set process name
+$0='#{projectname}'
+
+require 'pathname'
+ABS_PATH = Pathname.new(__FILE__).realpath.dirname.parent
+$LOAD_PATH << ABS_PATH + "lib/"
+
+require 'commander/import'
+require '#{projectname}'
+
+program(:version, 'unreleased')
+program(:description, '#{options.description}')
+program(:help, 'Author', '#{options.author} #{options.email}')
+default_command :main
+
+command :main do |c|
+	c.syntax = '#{projectname} main [options]'
+	c.summary = ''
+	c.description = ''
+	c.example 'description', 'command example'
+	c.option '--some-switch', 'Some switch that does something'
+	c.action do |args, options|
+		# do something
+	end
+end
+}
+end
+
+def text_gemspec(projectname, options)
+now = Time.now
+%Q{require 'rake'
+
+Gem::Specification.new do |s|
+
+	s.name		=	'#{projectname}'
+	s.version	=	'0.1'
+	s.date		=	'#{now.year}-#{now.month.to_s.rjust(2,'0')}-#{now.mday.to_s.rjust(2,'0')}'
+	s.summary	=	"#{options.description}"
+	s.authors	=	["#{options.author}"]
+	s.email		=	'#{options.email}'
+	s.files		=	FileList["bin/*","lib/*.rb","lib/#{projectname}/*.rb"].to_a
+	s.homepage	=	""
+
+end
+}
+end
+
+
+def text_gitignore
+%Q{.*.swp
+*.gem
+Gemfile.lock
+}
 end
