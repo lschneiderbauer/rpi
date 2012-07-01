@@ -19,6 +19,7 @@ command :init do |c|
 	c.option('-d', '--description DESCRIPTION', String, 'Set a project description.')
 	c.option('-a', '--author AUTHOR', String, 'Set the project author (overrides the default setting).')
 	c.option('-e', '--email EMAIL', String, 'Set the authors email address (overrides the default setting).')
+	c.option('-b', '--enableebuild', 'Also create a gentoo-ebuild for a github-project.')
 	c.option('-g', '--enablegit', 'Also initialize a git repository.')
 	c.action do |args, options|
 		options.default(:description => "<DESCRIPTION>")
@@ -125,6 +126,18 @@ def init(args,options)
 		end
 	end
 
+	
+	# create ebuild if enabled
+	#
+	work ("Create Gentoo-Ebuild #{c(projectname + "/res/#{projectname}.ebuild", :bold)}") do
+		begin
+			File.open("./#{projectname}/res/#{projectname}.ebuild", 'w') {|f| f.write(text_ebuild(projectname,options))}
+			0
+		rescue
+			false
+		end
+	end if options.enableebuild
+
 
 	# initialize git if enabled
 	#
@@ -143,7 +156,7 @@ def init(args,options)
 end
 
 
-LJUST=50
+LJUST=60
 
 # covers shell calls
 #
@@ -288,6 +301,37 @@ end
 }
 end
 
+def text_ebuild(projectname,options)
+%Q{# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# # $Header: $
+
+EAPI=4
+
+USE_RUBY="ruby18 ruby19"
+
+RUBY_FAKEGEM_TASK_DOC=""
+
+inherit ruby-fakegem
+
+DESCRIPTION="#{options.description}"
+#HOMEPAGE="HOMEPAGE"
+
+GITHUB_USER="GITHUBUSER"
+SRC_URI="https://github.com/${GITHUB_USER}/${PN}/tarball/v${PV} -> ${P}.tgz"
+RUBY_S="${GITHUB_USER}-${PN}-*"
+
+LICENSE="GPL-2"
+SLOT="0"
+KEYWORDS="~amd64"
+
+RDEPEND="${RDEPEND} >=dev-ruby/commander-4.1.1"
+
+all_ruby_install() {
+       ruby_fakegem_binwrapper #{projectname} || die
+}
+}
+end
 
 def text_gitignore
 %Q{.*.swp
