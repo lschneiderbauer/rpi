@@ -33,8 +33,10 @@ command :author do |c|
 	c.syntax = 'rpi author [author]'
 	c.summary = 'Set or display the default author.'
 	c.description = 'Sets or displays the default author used for generating the initial project structure.'
-	c.example("Set default author to \'Foo Bar\'", "rpi author \"Foo Bar\"")
+	c.example("Set default author to \'Foo Bar\'", "rpi author --name \"Foo Bar\"")
 	c.example("Get the current default author", "rpi author")
+	c.option('-n', '--name NAME', String, 'Set the default author name.')
+	c.option('-e', '--email EMAIL', String, 'Set the default email adress.')
 
 	c.action do |args, options|
 
@@ -44,24 +46,6 @@ command :author do |c|
 			#todo
 		else
 			# set
-			#todo
-		end
-	end
-end
-
-command :email do |c|
-	c.syntax = 'rpi email [email]'
-	c.summary = 'Set or display the default email address.'
-	c.description = 'Sets or displays the default email adress used for generating the initial project structure.'
-	c.example("Set default email address", "rpi email \"email@adress.com\"")
-
-	c.action do |args, options|
-		email = args.shift
-		if email.nil?
-			#display
-			#todo
-		else
-			#set
 			#todo
 		end
 	end
