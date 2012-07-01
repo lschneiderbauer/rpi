@@ -275,7 +275,13 @@ Gem::Specification.new do |s|
 	s.summary	=	"#{options.description}"
 	s.authors	=	#{projectname.capitalize}::AUTHORS.collect { |e| e[:name] }
 	s.email		=	#{projectname.capitalize}::AUTHORS.collect { |e| e[:email] }
-	s.files		=	FileList["bin/*","lib/*.rb","lib/#{projectname}/*.rb"].to_a
+	s.files		=	FileList[
+					"bin/*",
+					"lib/*.rb",
+					"lib/#{projectname}/*.rb",
+					"README",
+					"LICENSE"
+				].to_a
 	s.homepage	=	#{projectname.capitalize}::HOMEPAGE
 
 end
