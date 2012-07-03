@@ -13,7 +13,5 @@ def text_readme(projectname, options)
 
 * visionmedia/commander (tested against v4.1.1)
   https://github.com/visionmedia/commander/
-* highline (tested against v1.6.11)
-  http://rubyforge.org/projects/highline/
 }
 end
