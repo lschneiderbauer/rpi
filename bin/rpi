@@ -7,6 +7,10 @@ $LOAD_PATH << ABS_PATH + "lib/"
 require 'commander/import'
 require 'rpi'
 
+FILENAME = ".rpi.dat"
+DEFAULT_AUTHOR = {:name => "Max Muster", :email => "max@muster.com"}
+
+
 program(:version, 'unreleased')
 program(:description, 'Ruby Project Generator')
 program(:help, 'Author', 'Lukas Schneiderbauer <lukas.schneiderbauer@gmail.com>')
@@ -25,7 +29,10 @@ command :init do |c|
 	c.action do |args, options|
 		options.default(:description => "<DESCRIPTION>")
 
-		#TODO: author, email:  default to <default>
+		# set default author option
+		defauthor = (Hash.load(FILENAME) || DEFAULT_AUTHOR)
+		options.default(:author => defauthor[:name])
+		options.default(:email => defauthor[:email])
 		
 		init(args,options)
 	end
@@ -42,14 +49,20 @@ command :author do |c|
 
 	c.action do |args, options|
 
-		author = args.shift
-		if author.nil?
-			# display
-			#todo
-		else
-			# set
-			#todo
+		defauthor = (Hash.load(FILENAME) || DEFAULT_AUTHOR)
+
+		unless options.name.nil?
+			defauthor[:name] = options.name
 		end
+
+		unless options.email.nil?
+			defauthor[:email] = options.email
+		end
+
+		# safe and display it
+		defauthor.save(FILENAME)
+		say("Name: #{defauthor[:name]}")
+		say("Email: #{defauthor[:email]}")
 	end
 end
 
