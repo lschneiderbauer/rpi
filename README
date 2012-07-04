@@ -7,7 +7,8 @@ Script to initialize ruby project sessions.
 
 * Creates directory structure
 * Provides template files
-* Git support
+* Provide gemspec file for easy gem creation
+* Automatic Git-repository initialization
 * Creation of Gentoo ebuilds for Github projects
 
 
