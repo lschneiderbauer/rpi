@@ -13,5 +13,5 @@ Script to initialize ruby project sessions.
 
 == Requirements
 
-* visionmedia/commander (tested again v4.1.1)
+* visionmedia/commander (tested against v4.1.1)
   https://github.com/visionmedia/commander/
