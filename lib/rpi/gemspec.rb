@@ -1,7 +1,7 @@
 def text_gemspec(projectname, options)
 now = Time.now
 %Q{require 'rake'
-require 'lib/#{projectname}'
+require './lib/#{projectname}'
 
 Gem::Specification.new do |s|
 
