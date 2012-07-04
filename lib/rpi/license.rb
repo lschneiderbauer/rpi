@@ -1,5 +1,5 @@
 def text_license(projectname, options)
-%Q{Copyright (C) 2011  #{options.author}
+%Q{Copyright (C) #{Time.now.year}  #{options.author}
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
