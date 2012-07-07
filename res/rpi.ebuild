@@ -14,7 +14,7 @@ DESCRIPTION="A ruby project initializer solution"
 HOMEPAGE=""
 
 GITHUB_USER="vootey"
-SRC_URI="https://github.com/${GITHUB_USER}/${PN}/tarball/v${PV} -> ${P}.tgz"
+SRC_URI="https://github.com/${GITHUB_USER}/${PN}/tarball/r${PV} -> ${P}.tgz"
 RUBY_S="${GITHUB_USER}-${PN}-*"
 
 LICENSE="GPL-2"
