@@ -1,5 +1,5 @@
 def text_gitignore(projectname, options)
-%Q{.*.swp
+%Q{*.swp
 *.gem
 Gemfile.lock
 }
