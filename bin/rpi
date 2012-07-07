@@ -11,7 +11,7 @@ FILENAME = ".rpi.dat"
 DEFAULT_AUTHOR = {:name => "Max Muster", :email => "max@muster.com"}
 
 
-program(:version, 'unreleased')
+program(:version, '0.1')
 program(:description, 'Ruby Project Generator')
 program(:help, 'Author', 'Lukas Schneiderbauer <lukas.schneiderbauer@gmail.com>')
 default_command :init
