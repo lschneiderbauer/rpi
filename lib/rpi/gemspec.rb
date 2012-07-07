@@ -19,6 +19,8 @@ Gem::Specification.new do |s|
 					"LICENSE"
 				].to_a
 	s.homepage      =       #{projectname.capitalize}::HOMEPAGE
+
+	s.add_dependency('commander', '>= 4.1.1')
 end
 }
 end
