@@ -15,7 +15,7 @@ DESCRIPTION="#{options.description}"
 #HOMEPAGE="HOMEPAGE"
 
 GITHUB_USER="GITHUBUSER"
-SRC_URI="https://github.com/${GITHUB_USER}/${PN}/tarball/v${PV} -> ${P}.tgz"
+SRC_URI="https://github.com/${GITHUB_USER}/${PN}/tarball/r${PV} -> ${P}.tgz"
 RUBY_S="${GITHUB_USER}-${PN}-*"
 
 LICENSE="GPL-2"
