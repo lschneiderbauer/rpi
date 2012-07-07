@@ -1,7 +1,12 @@
 def text_gemspec(projectname, options)
 now = Time.now
-%Q{require 'rake'
-require './lib/#{projectname}'
+%Q{require 'pathname'
+ABS_PATH = Pathname.new(__FILE__).realpath.dirname
+$LOAD_PATH << ABS_PATH + "lib/"
+
+
+require 'rake'
+require '#{projectname}'
 
 Gem::Specification.new do |s|
 
